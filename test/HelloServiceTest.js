@@ -1,5 +1,5 @@
 const assert = require('assert')
-
+const jwt = require('jsonwebtoken')
 const carbon = require('carbon-io')
 const __ = carbon.fibers.__(module)
 const _o = carbon.bond._o(module)
@@ -45,7 +45,7 @@ __(function() {
     /***************************************************************************
      * suppressServiceLogging
      */
-    suppressServiceLogging: false,
+    suppressServiceLogging: true,
 
     /***************************************************************************
      * tests
@@ -111,6 +111,28 @@ __(function() {
         }
       },
 
+      {
+        name: 'Authenticate bob@jones.com',
+        reqSpec: {
+          url: '/authenticate',
+          method: 'POST',
+          body: {
+            email: 'bob@jones.com',
+            password: '1234'
+          }
+        },
+        resSpec: {
+          statusCode: 200,
+          body: function(body, context) {
+            assert.deepEqual(body, {
+              _id: context.httpHistory.getRes(0).body._id,
+              email: 'bob@jones.com',
+              jwt: jwt.sign({ _id: context.httpHistory.getRes(0).body._id }, 'mySecret')
+            })
+          }
+        }
+      },
+
       // Test GET user with correct credentials
       {
         name: 'GET /users/:_id',
@@ -119,7 +141,7 @@ __(function() {
             url: context.httpHistory.getRes('POST /users bob@jones.com').headers.location,
             method: 'GET',
             headers: {
-              Authorization: authorizationHeader('bob@jones.com', '1234'),
+              Authorization: 'Bearer ' + context.httpHistory.getRes('Authenticate bob@jones.com').body.jwt
             }
           }
         },
@@ -140,7 +162,7 @@ __(function() {
             url: context.httpHistory.getRes('POST /users bob@jones.com').headers.location,
             method: 'GET',
             headers: {
-              Authorization: authorizationHeader('alice@smith.com', '5678'),
+              Authorization: 'Bearer ' + authorizationHeader('wrongID')
             }
           }
         },
@@ -165,13 +187,93 @@ __(function() {
               password: 'abcd'
             },
             headers: {
-              Authorization: authorizationHeader('bob@jones.com', '1234'),
+              Authorization: 'Bearer ' + context.httpHistory.getRes('Authenticate bob@jones.com').body.jwt
             }
           }
         },
         resSpec: {
           statusCode: 200,
           body: { n: 1 }
+        }
+      },
+
+      {
+        name: 'GET /hello with correct creds',
+        reqSpec: function(context) {
+          return {
+            url: '/hello',
+            method: "GET",
+            headers: {
+              Authorization: 'Bearer ' + context.httpHistory.getRes('Authenticate bob@jones.com').body.jwt
+            }
+          }
+        },
+        resSpec: {
+          statusCode: 200,
+          body: { msg: "Hello world!" }
+        }
+      },
+
+      {
+        name: 'GET /hello with incorrectly signed JWT',
+        reqSpec: function(context) {
+          return {
+            url: '/hello',
+            method: "GET",
+            headers: {
+              Authorization: 'Bearer ' + authorizationHeader(context.httpHistory.getRes(0).body._id, 'wrongSecret')
+            }
+          }
+        },
+        resSpec: {
+          statusCode: 401,
+          body: {
+            code: 401,
+            description: 'Unauthorized',
+            message: 'JsonWebTokenError: invalid signature'
+          }
+        }
+      },
+
+      {
+        name: 'GET /hello with malformed Auth header',
+        reqSpec: function(context) {
+          return {
+            url: '/hello',
+            method: "GET",
+            headers: {
+              Authorization: 'Basic malformed header'
+            }
+          }
+        },
+        resSpec: {
+          statusCode: 401,
+          body: {
+            code: 401,
+            description: 'Unauthorized',
+            message: 'Invalid Authorization Header'
+          }
+        }
+      },
+
+      {
+        name: 'GET /hello with correctly signed JWT with wrong creds',
+        reqSpec: function(context) {
+          return {
+            url: '/hello',
+            method: "GET",
+            headers: {
+              Authorization: 'Bearer ' + authorizationHeader('wrongID')
+            }
+          }
+        },
+        resSpec: {
+          statusCode: 403,
+          body: {
+            code: 403,
+            description: 'Forbidden',
+            message: 'User does not have permission to perform operation'
+          }
         }
       },
 
@@ -183,7 +285,7 @@ __(function() {
             url: context.httpHistory.getRes('POST /users bob@jones.com').headers.location,
             method: 'DELETE',
             headers: {
-              Authorization: authorizationHeader('bob@jones.com', 'abcd'),
+              Authorization: 'Bearer ' + context.httpHistory.getRes('Authenticate bob@jones.com').body.jwt
             }
           }
         },
@@ -191,39 +293,8 @@ __(function() {
           statusCode: 200,
           body: { n: 1 }
         }
-      },
-
-      // Test GET with no authentication
-      {
-        description: 'Should return 403',
-        reqSpec: {
-          url: '/hello',
-          method: "GET",
-        },
-        resSpec: {
-          statusCode: 403, // Should be 401
-          body: {
-            code: 403,
-            description: 'Forbidden',
-            message: 'User does not have permission to perform operation'
-          }
-        }
-      },
-
-      // Test GET with user
-      {
-        reqSpec: {
-          url: '/hello',
-          method: "GET",
-          headers: {
-            Authorization: authorizationHeader('alice@smith.com', '5678')
-          }
-        },
-        resSpec: {
-          statusCode: 200,
-          body: { msg: "Hello world!" }
-        }
       }
+
     ]
   })
 })
@@ -231,7 +302,6 @@ __(function() {
 /***************************************************************************************************
  * authorizationHeader()
  */
-function authorizationHeader(username, password) {
-  var s = new Buffer(`${username}:${password}`).toString('base64')
-  return `Basic ${s}`
+function authorizationHeader(_id, secret = 'mySecret') {
+  return jwt.sign({ _id: _id }, secret)
 }

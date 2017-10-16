@@ -1,22 +1,19 @@
-# Hello Service (HTTP Basic Authentication)
+# Hello Service (With Custom Authentication)
 
-In this example we show usage of HTTP Basic Authentication using the `MongoDBHttpBasicAuthenticator` class.
+In this example we show usage of custom authentication by subclassing the `Authenticator` class. We implement
 
 The code defining the service is located in `lib/HelloService.js` and uses a simple `Endpoint` object
 to implement an HTTP `GET` at the path `/hello`.
 
 **Authentication**
 
-This service has an `authenticator` defined that authenticates users based on a username and password stored in MongoDB.
+This service has an `authenticator` defined that authenticates users based on a JSON Web Token.
 
 ```js
 o({
-  _type: carbon.carbond.security.MongoDBHttpBasicAuthenticator,
-  passwordHashFn: carbon.carbond.security.BcryptHasher,
-  userCollection: "users",
-  usernameField: "email",
-  passwordField: "password"
-})
+  _type: _o('./JWTAuthenticator'),
+  secret: "mySecret"
+}),
 ```
 
 This authenticator ensures that an API key is presented for each request to the service and that the
