@@ -50,7 +50,7 @@ module.exports = oo({
   authenticate: function(req) {
     // Check the Authorization header is present
     if (req.headers && req.headers.authorization) {
-      let  parts = req.headers.authorization.split(' ');
+      let parts = req.headers.authorization.split(' ');
 
       // Check the Authorization Header is well formed
       if (parts.length === 2 && parts[0] === 'Bearer') {
