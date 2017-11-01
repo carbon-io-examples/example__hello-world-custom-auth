@@ -125,8 +125,6 @@ __(function() {
           statusCode: 200,
           body: function(body, context) {
             assert.deepEqual(body, {
-              _id: context.httpHistory.getRes(0).body._id,
-              email: 'bob@jones.com',
               jwt: jwt.sign({ _id: context.httpHistory.getRes(0).body._id }, 'mySecret')
             })
           }
