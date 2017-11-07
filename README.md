@@ -104,7 +104,7 @@ o({
 We encourage you to clone the git repository so you can play around with the code.
 
 ```
-$ git clone -b carbon-0.7 -b carbon-0.7 git@github.com:carbon-io-examples/example__hello-world-custom-auth.git
+$ git clone -b carbon-0.7 git@github.com:carbon-io-examples/example__hello-world-custom-auth.git
 $ cd example__hello-world-custom-auth
 $ npm install
 ```
@@ -175,9 +175,17 @@ $ npm test
 
 ## Generating API documentation (aglio flavor)
 
+To generate documentation using aglio, install it as a devDependency:
+
+```
+$ npm install -D --no-optional aglio
+```
+
+Using `--no-optional` speeds up aglio's install time significantly. Then generate the docs using this command:
+
 ```sh
 $ node lib/HelloService gen-static-docs --flavor aglio --out docs/index.html
 ```
 
 * [View current documentation](
-http://htmlpreview.github.io/?https://raw.githubusercontent.com/carbon-io-guides/example__hello-world-service-http-basic-auth/master/docs/index.html)
+http://htmlpreview.github.io/?https://raw.githubusercontent.com/carbon-io-examples/example__hello-world-custom-auth/tree/carbon-0.7/docs/index.html)
