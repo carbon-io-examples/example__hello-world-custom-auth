@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "description": "Carbon.io Example: Hello-world Service (HTTP Basic Authentication)",
   "engines": {
-    "node": ">=4.0"
+    "node": ">=6.0"
   },
   "repository": {
     "type": "git",
