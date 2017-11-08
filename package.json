@@ -10,7 +10,7 @@
     "url": "https://github.com/carbon-io-guides/example__hello-world-service-http-basic-auth"
   },
   "dependencies": {
-    "carbon-io": "^0.6.2",
+    "carbon-io": "0.7.x",
     "jsonwebtoken": "^8.1.0"
   },
   "scripts": {
