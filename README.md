@@ -1,5 +1,7 @@
 # Hello Service (With Custom Authentication)
 
+[![Build Status](https://img.shields.io/travis/carbon-io-examples/example__hello-world-custom-auth.svg?style=flat-square)](https://travis-ci.org/carbon-io-examples/example__hello-world-custom-auth) ![Carbon Version](https://img.shields.io/badge/carbon--io-0.7-blue.svg?style=flat-square)
+
 In this example we show usage of custom authentication by subclassing the `Authenticator` class. We implement a custom `authenticate` method which
 checks for the presence of a valid JSON Web Token (JWT). Let's take a look at how the Service is structured:
 
