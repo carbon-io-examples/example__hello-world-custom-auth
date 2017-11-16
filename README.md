@@ -5,7 +5,7 @@
 
 
 In this example we show usage of custom authentication by subclassing the `Authenticator` class. We implement a custom `authenticate` method which
-checks for the presence of a valid JSON Web Token (JWT). Let's take a look at how the Service is structured:
+checks for the presence of a valid [JSON Web Token](https://jwt.io/) (JWT). Let's take a look at how the Service is structured:
 
 - `lib/HelloService.js`: Defines the basic Service
 - `lib/UsersEndpoint.js`: Defines the collection for managing users. Creating new users does not require authentication.
@@ -33,25 +33,21 @@ object as a field called `user` so that it may be used by the request downstream
 The custom authenticator is defined in `lib/JWTAuthenticator`. It is a subclass of `carbon.carbond.security.Authenticator`. When creating a custom authenticator, you must define the `authenticate` method. This method takes in the request object and should return a user object or undefined.
 
 ```js
-module.exports = oo({
+class JWTAuthenticator extends carbon.carbond.security.Authenticator {
 
-  /***************************************************************************
-  * _type
-  */
-  _type: carbon.carbond.security.Authenticator,
-
-  _C: function() {
+  constructor() {
+    super()
 
     /*************************************************************************
     * secret
     */
     this.secret = null
-  },
+  }
 
   /***************************************************************************
   * authenticate
   */
-  authenticate: function(req) {
+  authenticate(req) {
     // Check the Authorization header is present
     if (req.headers && req.headers.authorization) {
       let parts = req.headers.authorization.split(' ');
@@ -66,19 +62,19 @@ module.exports = oo({
           let user = this.service.db.getCollection('users').findOne({ _id: jwtbody._id })
           return user
         } catch (e) {
-          throw new this.service.errors.Unauthorized(`${e.name}: ${e.message}`)
+          this.throwUnauthenticated(`${e.name}: ${e.message}`)
         }
 
       } else {
-        throw new this.service.errors.Unauthorized('Invalid Authorization Header')
+        this.throwUnauthenticated('Invalid Authorization Header')
       }
 
     } else {
-      throw new this.service.errors.Unauthorized('No Authorization Header')
+      this.throwUnauthenticated('No Authorization Header')
     }
   }
 
-})
+}
 ```
 
 **Access Control**
