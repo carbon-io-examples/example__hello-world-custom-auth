@@ -1,5 +1,9 @@
 # Hello Service (With Custom Authentication)
 
+[![Build Status](https://img.shields.io/travis/carbon-io-examples/example__hello-world-custom-auth/master.svg?style=flat-square)](https://travis-ci.org/carbon-io-examples/example__hello-world-custom-auth) ![Carbon Version](https://img.shields.io/badge/carbon--io-0.7-blue.svg?style=flat-square)
+
+
+
 In this example we show usage of custom authentication by subclassing the `Authenticator` class. We implement a custom `authenticate` method which
 checks for the presence of a valid JSON Web Token (JWT). Let's take a look at how the Service is structured:
 
@@ -104,8 +108,8 @@ o({
 We encourage you to clone the git repository so you can play around with the code.
 
 ```
-$ git clone git@github.com:carbon-io-guides/example__hello-world-custom-auth.git
-$ cd example__hello-world-service-custom-auth
+$ git clone -b carbon-0.7 git@github.com:carbon-io-examples/example__hello-world-custom-auth.git
+$ cd example__hello-world-custom-auth
 $ npm install
 ```
 
@@ -175,9 +179,17 @@ $ npm test
 
 ## Generating API documentation (aglio flavor)
 
+To generate documentation using aglio, install it as a devDependency:
+
+```
+$ npm install -D --no-optional aglio
+```
+
+Using `--no-optional` speeds up aglio's install time significantly. Then generate the docs using this command:
+
 ```sh
 $ node lib/HelloService gen-static-docs --flavor aglio --out docs/index.html
 ```
 
 * [View current documentation](
-http://htmlpreview.github.io/?https://raw.githubusercontent.com/carbon-io-guides/example__hello-world-service-http-basic-auth/master/docs/index.html)
+http://htmlpreview.github.io/?https://raw.githubusercontent.com/carbon-io-examples/example__hello-world-custom-auth/tree/carbon-0.7/docs/index.html)
