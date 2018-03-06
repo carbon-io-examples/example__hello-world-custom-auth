@@ -3,14 +3,14 @@
   "version": "0.1.0",
   "description": "Carbon.io Example: Hello-world Service (HTTP Basic Authentication)",
   "engines": {
-    "node": ">=4.0"
+    "node": ">=6.0"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/carbon-io-guides/example__hello-world-service-http-basic-auth"
   },
   "dependencies": {
-    "carbon-io": "^0.6.2",
+    "carbon-io": "^0.7.0",
     "jsonwebtoken": "^8.1.0"
   },
   "scripts": {
